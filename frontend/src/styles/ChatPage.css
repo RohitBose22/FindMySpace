@@ -1,0 +1,32 @@
+.chat-page {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  background-color: #f8f9fa;
+  padding: 20px;
+  gap: 20px; 
+  box-sizing: border-box;
+}
+
+
+.chat-list-container, .chat-window {
+  height: 100%;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+
+.chat-list-container {
+  width: 300px; 
+  overflow-y: auto;
+}
+
+
+.chat-window {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  
+}

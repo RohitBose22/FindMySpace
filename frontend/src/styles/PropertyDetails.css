@@ -1,0 +1,71 @@
+.property-details {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 15px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #222;
+}
+
+.property-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+.property-images {
+  display: flex;
+  overflow-x: auto;
+  gap: 15px;
+  margin-bottom: 30px;
+  padding-bottom: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #888 transparent;
+}
+
+.property-images::-webkit-scrollbar {
+  height: 8px;
+}
+
+.property-images::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 4px;
+}
+
+.property-image {
+  flex: 0 0 auto;
+  width: 280px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.property-image:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.property-description {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #444;
+  margin-bottom: 20px;
+}
+
+.property-price,
+.property-location,
+.property-owner {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.property-price strong,
+.property-location strong,
+.property-owner strong {
+  font-weight: 600;
+}
