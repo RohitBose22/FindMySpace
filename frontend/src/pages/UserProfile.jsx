@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import "../styles/UserProfile.css";
 
-const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const backendUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 const UserProfile = () => {
   const { token } = useAuth();
