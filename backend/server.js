@@ -19,23 +19,22 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: CLIENT_ORIGIN,
     methods: ["GET", "POST"],
   },
 });
 
-app.use(cors());
+app.use(cors({ origin: CLIENT_ORIGIN, credentials: true }));
 app.use(express.json());
-
 
 app.use((req, res, next) => {
   req.io = io;
@@ -60,7 +59,6 @@ io.on("connection", (socket) => {
     try {
       const { chatId, message, senderId } = data;
 
-   
       const newMessage = new Message({
         chat: chatId,
         sender: senderId,
@@ -69,21 +67,17 @@ io.on("connection", (socket) => {
 
       await newMessage.save();
 
-   
       const populatedMessage = await Message.findById(newMessage._id).populate(
         "sender",
         "username"
       );
 
-   
       await Chat.findByIdAndUpdate(chatId, {
         latestMessage: newMessage._id,
       });
 
-
       socket.to(chatId).emit("receiveMessage", populatedMessage);
 
- 
       socket.emit("messageSent", populatedMessage);
     } catch (error) {
       console.error("Error saving/sending message in socket:", error);
@@ -99,5 +93,4 @@ const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
 
