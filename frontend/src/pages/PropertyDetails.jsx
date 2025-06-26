@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "../styles/PropertyDetails.css";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const PropertyDetails = () => {
   const { id } = useParams();
   const [property, setProperty] = useState(null);
@@ -11,7 +13,7 @@ const PropertyDetails = () => {
   useEffect(() => {
     const fetchProperty = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/properties/${id}`);
+        const res = await fetch(`${API_URL}/api/properties/${id}`);
         if (!res.ok) throw new Error("Failed to fetch property");
         const data = await res.json();
         setProperty(data);
@@ -50,8 +52,12 @@ const PropertyDetails = () => {
       </div>
 
       <p className="property-description">{property.description}</p>
-      <p className="property-price"><strong>Price:</strong> ₹{property.price}</p>
-      <p className="property-location"><strong>Location:</strong> {property.location}</p>
+      <p className="property-price">
+        <strong>Price:</strong> ₹{property.price}
+      </p>
+      <p className="property-location">
+        <strong>Location:</strong> {property.location}
+      </p>
       {property.owner && (
         <p className="property-owner">
           <strong>Owner:</strong> {property.owner.name} ({property.owner.email})

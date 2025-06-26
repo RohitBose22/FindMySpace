@@ -8,7 +8,7 @@ import Navbar from "./components/Navbar";
 import PropertyList from "./components/PropertyList";
 import UserProfile from "./pages/UserProfile";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import ChatPage from "./pages/ChatPage"; 
+import ChatPage from "./pages/ChatPage";
 import PropertyDetails from "./pages/PropertyDetails";
 
 const ProtectedRoute = ({ element }) => {
@@ -26,25 +26,11 @@ function App() {
           <Route path="/properties" element={<PropertyList />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route
-            path="/add-property"
-            element={<ProtectedRoute element={<AddProperty />} />}
-          />
+          <Route path="/add-property" element={<ProtectedRoute element={<AddProperty />} />} />
           <Route path="/property/:id" element={<PropertyDetails />} />
-
-          
-          <Route
-            path="/chat"
-            element={<ProtectedRoute element={<ChatPage />} />}
-          />
-
-          
+          <Route path="/chat" element={<ProtectedRoute element={<ChatPage />} />} />
           <Route path="/chat/:chatId" element={<Navigate to="/chat" />} />
-
-          <Route
-            path="/profile"
-            element={<ProtectedRoute element={<UserProfile />} />}
-          />
+          <Route path="/profile" element={<ProtectedRoute element={<UserProfile />} />} />
         </Routes>
       </main>
     </AuthProvider>

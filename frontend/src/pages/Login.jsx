@@ -12,14 +12,14 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); 
+    setError("");
 
     try {
       const { data } = await loginUser(formData);
 
       if (data.token) {
-        login(data.token, data.user); 
-        navigate("/"); 
+        login(data.token, data.user);
+        navigate("/");
       } else {
         setError("Invalid credentials. Please try again.");
       }
@@ -31,7 +31,7 @@ const Login = () => {
   return (
     <div className="login-container">
       <h2>Login</h2>
-      {error && <p className="error-message">{error}</p>} 
+      {error && <p className="error-message">{error}</p>}
       <form onSubmit={handleSubmit}>
         <input
           type="email"
@@ -56,6 +56,5 @@ const Login = () => {
 };
 
 export default Login;
-
 
 

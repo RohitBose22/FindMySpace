@@ -8,6 +8,8 @@ const PropertyCard = ({ property }) => {
   const { user, token } = useAuth();
   const navigate = useNavigate();
 
+  const backendUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
   const handleChatWithOwner = async () => {
     if (!token || !user) {
       alert("Please login to start a chat.");
@@ -21,7 +23,7 @@ const PropertyCard = ({ property }) => {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/chats", {
+      const res = await fetch(`${backendUrl}/api/chats`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -45,10 +47,9 @@ const PropertyCard = ({ property }) => {
 
   return (
     <div className="property-card">
-      
       {property.images && property.images.length > 0 ? (
         <img
-          src={property.images[0]} 
+          src={property.images[0]}
           alt={`${property.title} image 1`}
           className="property-image"
         />

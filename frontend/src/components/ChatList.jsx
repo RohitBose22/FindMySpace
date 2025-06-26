@@ -3,7 +3,7 @@ import { fetchChats } from "../api/api";
 import AuthContext from "../context/AuthContext";
 import "../styles/ChatList.css";
 
-const backendUrl = "http://localhost:5000";
+const backendUrl = import.meta.env.VITE_API_BASE_URL;
 
 const ChatList = ({ onSelectChat, selectedChat }) => {
   const { token, user } = useContext(AuthContext);
@@ -84,7 +84,6 @@ const ChatList = ({ onSelectChat, selectedChat }) => {
 };
 
 export default ChatList;
-
 
 
 

@@ -3,10 +3,10 @@ import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import "../styles/UserProfile.css";
 
-const backendUrl = "http://localhost:5000";
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const UserProfile = () => {
-  const { user, token } = useAuth();
+  const { token } = useAuth();
   const [editMode, setEditMode] = useState(false);
   const [userData, setUserData] = useState({ username: "", email: "", phone: "", profileImage: "" });
   const [profilePreview, setProfilePreview] = useState(null);
@@ -15,67 +15,80 @@ const UserProfile = () => {
   useEffect(() => {
     if (!token) return;
 
-    fetch(`${backendUrl}/api/users/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch(`${backendUrl}/api/users/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (!res.ok) throw new Error("Failed to fetch profile");
-        return res.json();
-      })
-      .then(({ user, properties }) => {
-        setUserData(user);
-        setProperties(properties);
+        const { user, properties } = await res.json();
 
-        
-        if (user.profileImage) {
-          setProfilePreview(user.profileImage);
+        setUserData(user || {});
+        setProperties(properties || []);
+
+        if (user?.profileImage) {
+          const profileImgUrl = user.profileImage.startsWith("http")
+            ? user.profileImage
+            : `${backendUrl}/uploads/${user.profileImage}`;
+          setProfilePreview(profileImgUrl);
+        } else {
+          setProfilePreview(null);
         }
-      })
-      .catch((err) => console.error("Error fetching profile:", err));
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+      }
+    };
+
+    fetchProfile();
   }, [token]);
 
   const handleChange = (e) => {
-    setUserData({ ...userData, [e.target.name]: e.target.value });
+    setUserData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setUserData({ ...userData, profileImage: file });
+      setUserData((prev) => ({ ...prev, profileImage: file }));
       setProfilePreview(URL.createObjectURL(file));
     }
   };
 
-  const handleSave = () => {
-    const formData = new FormData();
-    formData.append("username", userData.username);
-    formData.append("phone", userData.phone);
+  const handleSave = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("username", userData.username);
+      formData.append("phone", userData.phone);
 
-    
-    if (userData.profileImage instanceof File) {
-      formData.append("profileImage", userData.profileImage);
+      if (userData.profileImage instanceof File) {
+        formData.append("profileImage", userData.profileImage);
+      }
+
+      const res = await fetch(`${backendUrl}/api/users/profile`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Failed to update profile");
+
+      const updatedUser = await res.json();
+      setUserData(updatedUser);
+
+      if (updatedUser.profileImage) {
+        const profileImgUrl = updatedUser.profileImage.startsWith("http")
+          ? updatedUser.profileImage
+          : `${backendUrl}/uploads/${updatedUser.profileImage}`;
+        setProfilePreview(profileImgUrl);
+      }
+
+      setEditMode(false);
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      alert("Failed to update profile. Please try again.");
     }
-
-    fetch(`${backendUrl}/api/users/profile`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        
-      },
-      body: formData,
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to update profile");
-        return res.json();
-      })
-      .then((data) => {
-        setUserData(data);
-        setEditMode(false);
-        if (data.profileImage) {
-          setProfilePreview(data.profileImage);
-        }
-      })
-      .catch((err) => console.error("Error updating profile:", err));
   };
 
   const handleDelete = async (propertyId) => {
@@ -87,13 +100,12 @@ const UserProfile = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to delete property");
-      }
+      if (!res.ok) throw new Error("Failed to delete property");
 
-      setProperties(properties.filter((p) => p._id !== propertyId));
-    } catch (error) {
-      console.error("Error deleting property:", error);
+      setProperties((prev) => prev.filter((p) => p._id !== propertyId));
+    } catch (err) {
+      console.error("Error deleting property:", err);
+      alert("Failed to delete property. Please try again.");
     }
   };
 
@@ -109,7 +121,12 @@ const UserProfile = () => {
         <div className="profile-info">
           <label>Username:</label>
           {editMode ? (
-            <input type="text" name="username" value={userData.username} onChange={handleChange} />
+            <input
+              type="text"
+              name="username"
+              value={userData.username}
+              onChange={handleChange}
+            />
           ) : (
             <p>{userData.username}</p>
           )}
@@ -132,9 +149,13 @@ const UserProfile = () => {
           )}
 
           {editMode ? (
-            <button className="save-btn" onClick={handleSave}>Save</button>
+            <button className="save-btn" onClick={handleSave}>
+              Save
+            </button>
           ) : (
-            <button className="edit-btn" onClick={() => setEditMode(true)}>Edit</button>
+            <button className="edit-btn" onClick={() => setEditMode(true)}>
+              Edit
+            </button>
           )}
         </div>
       </div>
@@ -144,12 +165,16 @@ const UserProfile = () => {
         {properties.length > 0 ? (
           properties.map((property) => (
             <div key={property._id} className="property-card">
-              <img src={property.images[0]} alt={property.title} />
+              <img src={property.images?.[0]} alt={property.title} />
               <h4>{property.title}</h4>
               <p>{property.description}</p>
               <p>Price: Rs{property.price}</p>
-              <Link to={`/property/${property._id}`} className="view-property-btn">View Property</Link>
-              <button className="delete-btn" onClick={() => handleDelete(property._id)}>Delete</button>
+              <Link to={`/property/${property._id}`} className="view-property-btn">
+                View Property
+              </Link>
+              <button className="delete-btn" onClick={() => handleDelete(property._id)}>
+                Delete
+              </button>
             </div>
           ))
         ) : (
@@ -161,7 +186,6 @@ const UserProfile = () => {
 };
 
 export default UserProfile;
-
 
 
 

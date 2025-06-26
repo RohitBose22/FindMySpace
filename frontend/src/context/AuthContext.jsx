@@ -1,21 +1,22 @@
-import React from "react";
-import { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token") || ""); 
+  const [token, setToken] = useState(localStorage.getItem("token") || "");
+
+  const backendUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
   useEffect(() => {
     if (token) {
-      fetch("http://localhost:5000/api/users/profile", {
+      fetch(`${backendUrl}/api/users/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
         .then((data) => {
           if (data.user) {
-            setUser(data.user); 
+            setUser(data.user);
           } else {
             console.error("Invalid user data:", data);
             logout();
@@ -26,17 +27,16 @@ export const AuthProvider = ({ children }) => {
           logout();
         });
     }
-  }, [token]);
-  
+  }, [token, backendUrl]);
 
   const login = (token, userData) => {
-    localStorage.setItem("token", token); 
+    localStorage.setItem("token", token);
     setToken(token);
     setUser(userData);
   };
 
   const logout = () => {
-    localStorage.removeItem("token"); 
+    localStorage.removeItem("token");
     setToken("");
     setUser(null);
   };
@@ -50,5 +50,4 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => useContext(AuthContext);
 export default AuthContext;
-
 

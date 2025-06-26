@@ -10,7 +10,6 @@ const ChatWindow = ({ chatId }) => {
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
 
-
   if (!chatId || chatId === "undefined") {
     return (
       <div className="chat-window-container no-chat-selected">
@@ -19,7 +18,6 @@ const ChatWindow = ({ chatId }) => {
     );
   }
 
-  
   useEffect(() => {
     const loadMessages = async () => {
       try {
@@ -36,7 +34,6 @@ const ChatWindow = ({ chatId }) => {
     loadMessages();
   }, [chatId, token]);
 
-  
   useEffect(() => {
     if (!chatId) return;
 
@@ -46,7 +43,6 @@ const ChatWindow = ({ chatId }) => {
       if (!message._id) return;
 
       setMessages((prevMessages) => {
-       
         if (prevMessages.some((msg) => msg._id === message._id)) {
           return prevMessages;
         }
@@ -56,19 +52,16 @@ const ChatWindow = ({ chatId }) => {
 
     socket.on("receiveMessage", handleReceiveMessage);
 
-    
     return () => {
       socket.off("receiveMessage", handleReceiveMessage);
-      socket.emit("leaveChat", chatId);  
+      socket.emit("leaveChat", chatId);
     };
   }, [chatId]);
 
-  
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !chatId) return;
 
@@ -76,9 +69,7 @@ const ChatWindow = ({ chatId }) => {
       const { data } = await sendMessage(chatId, newMessage, token);
 
       if (data && !messages.some((msg) => msg._id === data._id)) {
-        
         setMessages((prevMessages) => [...prevMessages, data]);
-        
         socket.emit("sendMessage", { ...data, chatId, senderId: user._id });
       }
       setNewMessage("");
@@ -87,7 +78,6 @@ const ChatWindow = ({ chatId }) => {
     }
   };
 
-  
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && newMessage.trim()) {
       e.preventDefault();

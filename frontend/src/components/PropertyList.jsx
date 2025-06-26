@@ -13,6 +13,8 @@ const PropertyList = () => {
   const [filterType, setFilterType] = useState("all");
   const [filterLocation, setFilterLocation] = useState("");
 
+  const backendUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchProperties = async () => {
       try {
@@ -28,7 +30,7 @@ const PropertyList = () => {
           params.append("location", filterLocation.trim());
         }
 
-        const response = await fetch(`http://localhost:5000/api/properties?${params.toString()}`);
+        const response = await fetch(`${backendUrl}/api/properties?${params.toString()}`);
 
         if (!response.ok) throw new Error("Failed to fetch properties");
 
@@ -42,7 +44,7 @@ const PropertyList = () => {
     };
 
     fetchProperties();
-  }, [filterType, filterLocation]);
+  }, [filterType, filterLocation, backendUrl]);
 
   useEffect(() => {
     localStorage.setItem("sortOrder", sortOrder);
@@ -59,7 +61,6 @@ const PropertyList = () => {
     <div className="property-list-container">
       <h2>Available Properties</h2>
 
-      {/* Filter & Sort Controls */}
       <div className="filter-sort-bar">
         <div className="filter-group">
           <label>Listing Type: </label>
@@ -95,7 +96,6 @@ const PropertyList = () => {
         </div>
       </div>
 
-      {/* Display Properties */}
       {sortedProperties.length > 0 ? (
         <div className="property-list">
           {sortedProperties.map((property) => (

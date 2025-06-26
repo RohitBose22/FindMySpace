@@ -11,8 +11,8 @@ const AddProperty = () => {
     listingType: "sell",
   });
 
-  const [images, setImages] = useState([]); 
-  const [previewImages, setPreviewImages] = useState([]); 
+  const [images, setImages] = useState([]);
+  const [previewImages, setPreviewImages] = useState([]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,7 +21,6 @@ const AddProperty = () => {
   const handleImageChange = (e) => {
     const newFiles = Array.from(e.target.files);
     const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
-
 
     setImages((prev) => [...prev, ...newFiles]);
     setPreviewImages((prev) => [...prev, ...newPreviews]);
