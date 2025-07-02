@@ -17,7 +17,6 @@ const PropertyCard = ({ property }) => {
     }
 
     if (!property.owner || !property.owner._id) {
-      console.error("Error: Property owner is missing.");
       alert("Invalid property details. Cannot start chat.");
       return;
     }
@@ -40,7 +39,6 @@ const PropertyCard = ({ property }) => {
 
       navigate(`/chat/${data._id}`);
     } catch (error) {
-      console.error("Error starting chat:", error);
       alert("Could not start chat. Try again.");
     }
   };
@@ -67,7 +65,7 @@ const PropertyCard = ({ property }) => {
           <FaRegComments /> Chat with Owner
         </button>
 
-        <button onClick={() => navigate(`/property/${property._id}`)} className="view-button">
+        <button onClick={() => navigate(`/properties/${property._id}`)} className="view-button">
           View Property
         </button>
       </div>

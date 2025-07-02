@@ -3,7 +3,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import Property from "../models/Property.js";
 
-
 export const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -27,7 +26,6 @@ export const register = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 export const login = async (req, res) => {
   try {
@@ -58,7 +56,6 @@ export const login = async (req, res) => {
   }
 };
 
-
 export const getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
@@ -73,7 +70,6 @@ export const getProfile = async (req, res) => {
   }
 };
 
-
 export const updateProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -82,14 +78,12 @@ export const updateProfile = async (req, res) => {
     user.username = req.body.username || user.username;
     user.phone = req.body.phone || user.phone;
 
-    
-    if (req.file) {
-      
-      user.profileImage = req.file.path || req.file.filename || user.profileImage;
+    if (req.file && req.file.path) {
+      user.profileImage = req.file.path;
     }
 
     const updatedUser = await user.save();
-    
+
     const userResponse = updatedUser.toObject();
     delete userResponse.password;
 
