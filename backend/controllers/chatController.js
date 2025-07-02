@@ -61,3 +61,31 @@ export const createChat = async (req, res) => {
     res.status(500).json({ message: "Error creating chat" });
   }
 };
+
+
+export const getChatById = async (req, res) => {
+  try {
+    const chat = await Chat.findById(req.params.chatId)
+      .populate("users", "username email profileImage")
+      .populate({
+        path: "latestMessage",
+        populate: { path: "sender", select: "username email profileImage" },
+      })
+      .lean();
+
+    if (!chat) {
+      return res.status(404).json({ message: "Chat not found" });
+    }
+
+   
+    if (!chat.users.some(u => u._id.toString() === req.user._id.toString())) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    res.json(chat);
+  } catch (error) {
+    console.error("Error fetching chat by ID:", error);
+    res.status(500).json({ message: "Error fetching chat" });
+  }
+};
+
