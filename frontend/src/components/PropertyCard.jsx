@@ -18,8 +18,11 @@ const PropertyCard = ({ property }) => {
 
     if (!property.owner || !property.owner._id) {
       alert("Invalid property details. Cannot start chat.");
+      console.error("Invalid owner object:", property.owner);
       return;
     }
+
+    console.log("Starting chat with owner ID:", property.owner._id);
 
     try {
       const res = await fetch(`${backendUrl}/api/chats`, {
@@ -32,13 +35,21 @@ const PropertyCard = ({ property }) => {
       });
 
       const data = await res.json();
+      console.log("Chat creation response:", data);
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to start chat");
       }
 
+      if (!data._id) {
+        console.error("Chat created but no chat ID returned:", data);
+        alert("Could not start chat. Try again.");
+        return;
+      }
+
       navigate(`/chat/${data._id}`);
     } catch (error) {
+      console.error("Error during chat creation:", error);
       alert("Could not start chat. Try again.");
     }
   };

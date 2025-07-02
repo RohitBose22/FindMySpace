@@ -10,6 +10,8 @@ const ChatWindow = ({ chatId }) => {
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
 
+  console.log("ChatWindow rendered with chatId:", chatId);
+
   if (!chatId || chatId === "undefined") {
     return (
       <div className="chat-window-container no-chat-selected">
@@ -21,7 +23,9 @@ const ChatWindow = ({ chatId }) => {
   useEffect(() => {
     const loadMessages = async () => {
       try {
+        console.log("Loading messages for chatId:", chatId);
         const { data } = await fetchMessages(chatId, token);
+        console.log("Fetched messages:", data);
         if (!Array.isArray(data)) {
           console.error("Invalid messages format:", data);
           return;
@@ -37,9 +41,11 @@ const ChatWindow = ({ chatId }) => {
   useEffect(() => {
     if (!chatId) return;
 
+    console.log("Joining chat room:", chatId);
     socket.emit("joinChat", chatId);
 
     const handleReceiveMessage = (message) => {
+      console.log("Received socket message:", message);
       if (!message._id) return;
 
       setMessages((prevMessages) => {
@@ -53,6 +59,7 @@ const ChatWindow = ({ chatId }) => {
     socket.on("receiveMessage", handleReceiveMessage);
 
     return () => {
+      console.log("Leaving chat room:", chatId);
       socket.off("receiveMessage", handleReceiveMessage);
       socket.emit("leaveChat", chatId);
     };
@@ -65,8 +72,11 @@ const ChatWindow = ({ chatId }) => {
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !chatId) return;
 
+    console.log("Sending message:", newMessage);
+
     try {
       const { data } = await sendMessage(chatId, newMessage, token);
+      console.log("Message sent, response:", data);
 
       if (data && !messages.some((msg) => msg._id === data._id)) {
         setMessages((prevMessages) => [...prevMessages, data]);

@@ -16,13 +16,16 @@ const ChatPage = () => {
     const fetchSelectedChat = async () => {
       if (chatId) {
         try {
+          console.log("Fetching chat details for chatId:", chatId);
           const res = await axios.get(`/api/chats/${chatId}`);
+          console.log("Fetched chat data:", res.data);
           setSelectedChat(res.data);
         } catch (error) {
           console.error("Failed to fetch chat:", error);
           setSelectedChat(null);
         }
       } else {
+        console.log("No chatId in URL, clearing selectedChat");
         setSelectedChat(null);
       }
     };
@@ -30,12 +33,16 @@ const ChatPage = () => {
     fetchSelectedChat();
   }, [chatId]);
 
-  
   const handleSelectChat = (chat) => {
     if (chat && chat._id) {
+      console.log("Chat clicked:", chat);
       navigate(`/chat/${chat._id}`);
     }
   };
+
+  useEffect(() => {
+    console.log("Current selectedChat state:", selectedChat);
+  }, [selectedChat]);
 
   return (
     <div className="chat-page">
@@ -43,7 +50,6 @@ const ChatPage = () => {
         onSelectChat={handleSelectChat}
         selectedChat={selectedChat}
       />
-
       {selectedChat ? (
         <ChatWindow chatId={selectedChat._id} />
       ) : (

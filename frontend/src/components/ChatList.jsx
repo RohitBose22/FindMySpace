@@ -15,6 +15,7 @@ const ChatList = ({ onSelectChat, selectedChat }) => {
     const loadChats = async () => {
       try {
         const response = await fetchChats(token);
+        console.log("Chats loaded:", response.data);
         setChats(response?.data || []);
       } catch (error) {
         console.error("Error loading chats:", error);
@@ -23,6 +24,10 @@ const ChatList = ({ onSelectChat, selectedChat }) => {
 
     loadChats();
   }, [token]);
+
+  useEffect(() => {
+    console.log("Selected chat in ChatList updated:", selectedChat?._id);
+  }, [selectedChat]);
 
   if (!user) {
     return <p>Loading chats...</p>;
@@ -55,7 +60,10 @@ const ChatList = ({ onSelectChat, selectedChat }) => {
                 <li
                   key={chat._id}
                   className={`chat-list-item ${isActive ? "active" : ""}`}
-                  onClick={() => onSelectChat(chat)}
+                  onClick={() => {
+                    console.log("Clicked chat:", chat);
+                    onSelectChat(chat);
+                  }}
                 >
                   <img
                     src={profileImage}
@@ -84,7 +92,5 @@ const ChatList = ({ onSelectChat, selectedChat }) => {
 };
 
 export default ChatList;
-
-
 
 
