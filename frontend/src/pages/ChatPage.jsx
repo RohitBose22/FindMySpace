@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { fetchChatById } from "../api/api";
 import ChatList from "../components/ChatList";
 import ChatWindow from "../components/ChatWindow";
 import AuthContext from "../context/AuthContext";
@@ -10,7 +10,7 @@ import "../styles/ChatWindow.css";
 const ChatPage = () => {
   const { chatId } = useParams();
   const navigate = useNavigate();
-  const { token } = useContext(AuthContext);  // ✅ Get token
+  const { token } = useContext(AuthContext);
 
   const [selectedChat, setSelectedChat] = useState(null);
 
@@ -19,11 +19,7 @@ const ChatPage = () => {
       if (chatId && token) {
         try {
           console.log("Fetching chat details for chatId:", chatId);
-          const res = await axios.get(`/api/chats/${chatId}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,  // ✅ Add Authorization header
-            },
-          });
+          const res = await fetchChatById(chatId, token);
           console.log("Fetched chat data:", res.data);
           setSelectedChat(res.data);
         } catch (error) {
