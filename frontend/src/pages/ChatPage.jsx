@@ -1,24 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ChatList from "../components/ChatList";
 import ChatWindow from "../components/ChatWindow";
+import AuthContext from "../context/AuthContext";
 import "../styles/ChatPage.css";
 import "../styles/ChatWindow.css";
-
-const backendUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 const ChatPage = () => {
   const { chatId } = useParams();
   const navigate = useNavigate();
+  const { token } = useContext(AuthContext);  // ✅ Get token
+
   const [selectedChat, setSelectedChat] = useState(null);
 
   useEffect(() => {
     const fetchSelectedChat = async () => {
-      if (chatId) {
+      if (chatId && token) {
         try {
           console.log("Fetching chat details for chatId:", chatId);
-          const res = await axios.get(`${backendUrl}/api/chats/${chatId}`);
+          const res = await axios.get(`/api/chats/${chatId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,  // ✅ Add Authorization header
+            },
+          });
           console.log("Fetched chat data:", res.data);
           setSelectedChat(res.data);
         } catch (error) {
@@ -26,13 +31,13 @@ const ChatPage = () => {
           setSelectedChat(null);
         }
       } else {
-        console.log("No chatId in URL, clearing selectedChat");
+        console.log("No chatId or token available, clearing selectedChat");
         setSelectedChat(null);
       }
     };
 
     fetchSelectedChat();
-  }, [chatId]);
+  }, [chatId, token]);
 
   const handleSelectChat = (chat) => {
     if (chat && chat._id) {
