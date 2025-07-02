@@ -2,13 +2,12 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaRegComments } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
+import { createChat } from "../api/api";
 import "../styles/PropertyCard.css";
 
 const PropertyCard = ({ property }) => {
   const { user, token } = useAuth();
   const navigate = useNavigate();
-
-  const backendUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
   const handleChatWithOwner = async () => {
     if (!token || !user) {
@@ -25,29 +24,16 @@ const PropertyCard = ({ property }) => {
     console.log("Starting chat with owner ID:", property.owner._id);
 
     try {
-      const res = await fetch(`${backendUrl}/api/chats`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ ownerId: property.owner._id }),
-      });
+      const res = await createChat(property.owner._id, token);
 
-      const data = await res.json();
-      console.log("Chat creation response:", data);
-
-      if (!res.ok) {
-        throw new Error(data.message || "Failed to start chat");
-      }
-
-      if (!data._id) {
-        console.error("Chat created but no chat ID returned:", data);
+      if (!res?.data?._id) {
+        console.error("Chat creation failed or no chat ID returned:", res?.data);
         alert("Could not start chat. Try again.");
         return;
       }
 
-      navigate(`/chat/${data._id}`);
+      console.log("Chat created successfully:", res.data);
+      navigate(`/chat/${res.data._id}`);
     } catch (error) {
       console.error("Error during chat creation:", error);
       alert("Could not start chat. Try again.");
@@ -76,7 +62,10 @@ const PropertyCard = ({ property }) => {
           <FaRegComments /> Chat with Owner
         </button>
 
-        <button onClick={() => navigate(`/properties/${property._id}`)} className="view-button">
+        <button
+          onClick={() => navigate(`/properties/${property._id}`)}
+          className="view-button"
+        >
           View Property
         </button>
       </div>

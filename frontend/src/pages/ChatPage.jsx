@@ -6,10 +6,11 @@ import ChatWindow from "../components/ChatWindow";
 import "../styles/ChatPage.css";
 import "../styles/ChatWindow.css";
 
+const backendUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
 const ChatPage = () => {
   const { chatId } = useParams();
   const navigate = useNavigate();
-
   const [selectedChat, setSelectedChat] = useState(null);
 
   useEffect(() => {
@@ -17,7 +18,7 @@ const ChatPage = () => {
       if (chatId) {
         try {
           console.log("Fetching chat details for chatId:", chatId);
-          const res = await axios.get(`/api/chats/${chatId}`);
+          const res = await axios.get(`${backendUrl}/api/chats/${chatId}`);
           console.log("Fetched chat data:", res.data);
           setSelectedChat(res.data);
         } catch (error) {
@@ -46,10 +47,7 @@ const ChatPage = () => {
 
   return (
     <div className="chat-page">
-      <ChatList
-        onSelectChat={handleSelectChat}
-        selectedChat={selectedChat}
-      />
+      <ChatList onSelectChat={handleSelectChat} selectedChat={selectedChat} />
       {selectedChat ? (
         <ChatWindow chatId={selectedChat._id} />
       ) : (
